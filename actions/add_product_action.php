@@ -80,7 +80,7 @@ $extension = $allowedTypes[$mimeType];
 $imageFilename = bin2hex(random_bytes(16)) . "." . $extension;
 
 // Set the image upload directory.
-$imageDirectory = realpath(__DIR__ . "/../images");
+$imageDirectory = realpath(__DIR__ . "/../images/products");
 
 if (
     $imageDirectory === false ||

@@ -497,7 +497,7 @@ if (isset($_GET["error"])) {
                             <p><strong>Current image:</strong></p>
 
                             <img
-                                src="../../images/<?= rawurlencode(
+                                src="../../images/products/<?= rawurlencode(
                                     basename($product["product_image"])
                                 ) ?>"
                                 alt="Current product image"
