@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Validation patterns
         const emailRegex =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+             /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         const phoneRegex =
             /^[0-9+\-\s]{7,15}$/;

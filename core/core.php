@@ -14,10 +14,17 @@ function is_admin()
     return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 1;
 }
 
+function base_url()
+{
+    return ($_SERVER['HTTP_HOST'] === 'localhost')
+        ? '/shoppn'
+        : '/~victoria.nyonator/ecommerce/shoppn';
+}
+
 function require_login()
 {
     if (!is_logged_in()) {
-        header("Location: /shoppn/views/login.php");
+        header("Location: " . base_url() . "/views/login.php");
         exit;
     }
 }
@@ -25,7 +32,7 @@ function require_login()
 function require_admin()
 {
     if (!is_admin()) {
-        header("Location: /shoppn/index.php");
+        header("Location: " . base_url() . "/index.php");
         exit;
     }
 }
