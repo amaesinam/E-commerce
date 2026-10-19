@@ -1,6 +1,11 @@
-```php
+
 <?php
 require_once __DIR__ . "/../../core/core.php";
+
+$base_url = (isset($_SERVER['HTTP_HOST']) &&
+             strpos($_SERVER['HTTP_HOST'], 'localhost') === 0)
+    ? '/shoppn'
+    : '/~victoria.nyonator/ecommerce/shoppn';
 ?>
 
 <!DOCTYPE html>
@@ -8,57 +13,79 @@ require_once __DIR__ . "/../../core/core.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Shoppn</title>
+
+    <!-- Load the latest stylesheet -->
+    <link rel="stylesheet"
+          href="<?php echo htmlspecialchars($base_url); ?>/css/style.css?v=5">
 </head>
 
 <body>
 
 <header>
-
-    <h1>Shoppn</h1>
+    <div class="logo">
+        <a href="<?php echo htmlspecialchars($base_url); ?>/index.php">
+            Shoppn
+        </a>
+    </div>
 
     <nav>
+        <a href="<?php echo htmlspecialchars($base_url); ?>/index.php">
+            Home
+        </a>
+
+        <!-- Cart link available to guests and logged-in users -->
+        <a href="<?php echo htmlspecialchars($base_url); ?>/views/cart.php">
+            Cart
+        </a>
+
         <?php if (is_logged_in()): ?>
-
-            <a href="/shoppn/index.php">
-                Welcome <?php echo htmlspecialchars($_SESSION['customer_name']); ?>
-            </a>
-
-            |
-
-            <a href="/shoppn/views/account/index.php">
+            <a href="<?php echo htmlspecialchars($base_url); ?>/views/account/index.php">
                 My Account
             </a>
 
-            |
+            <?php if (is_admin()): ?>
+                <a href="<?php echo htmlspecialchars($base_url); ?>/views/admin/brand.php">
+                    Brands
+                </a>
 
-            <a href="/shoppn/actions/logout_action.php">
+                <a href="<?php echo htmlspecialchars($base_url); ?>/views/admin/category.php">
+                    Categories
+                </a>
+
+                <a href="<?php echo htmlspecialchars($base_url); ?>/views/admin/product.php">
+                    Products
+                </a>
+            <?php endif; ?>
+
+            <a href="<?php echo htmlspecialchars($base_url); ?>/actions/logout_action.php">
                 Logout
             </a>
-
         <?php else: ?>
+            <a href="<?php echo htmlspecialchars($base_url); ?>/views/login.php">
+                Login
+            </a>
 
-            <a href="/shoppn/views/register.php">Register</a>
-
-            |
-
-            <a href="/shoppn/views/login.php">Login</a>
-
+            <a href="<?php echo htmlspecialchars($base_url); ?>/views/register.php">
+                Register
+            </a>
         <?php endif; ?>
     </nav>
 
-    <br>
-
-    <form action="#" method="GET">
+    <form
+        class="search-form"
+        action="<?php echo htmlspecialchars($base_url . '/views/search_results.php'); ?>"
+        method="GET"
+    >
         <input
             type="text"
-            name="search"
+            name="user_query"
             placeholder="Search products..."
+            aria-label="Search products"
+            required
         >
+
         <button type="submit">Search</button>
     </form>
-
 </header>
-
-<hr>
-```
