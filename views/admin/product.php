@@ -1,4 +1,3 @@
-
 <?php
 
 require_once __DIR__ . "/../../core/core.php";
@@ -8,6 +7,7 @@ require_once __DIR__ . "/../../controllers/ProductController.php";
 require_admin();
 
 $controller = new ProductController();
+$imageBaseUrl = "http://169.239.251.102:442/~victoria.nyonator/ecommerce/shoppn/images";
 
 // Helper function to safely display values.
 function productEscape($value)
@@ -69,7 +69,6 @@ if (isset($_GET["error"])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>
@@ -326,15 +325,11 @@ if (isset($_GET["error"])) {
             and one brand.
 
             <?php if (empty($categories)): ?>
-                <p>
-                    <a href="category.php">Add a category</a>
-                </p>
+                <p><a href="category.php">Add a category</a></p>
             <?php endif; ?>
 
             <?php if (empty($brands)): ?>
-                <p>
-                    <a href="brand.php">Add a brand</a>
-                </p>
+                <p><a href="brand.php">Add a brand</a></p>
             <?php endif; ?>
         </div>
 
@@ -360,23 +355,19 @@ if (isset($_GET["error"])) {
 
                 <div class="form-group">
                     <label for="product_title">Product Title</label>
-
                     <input
                         type="text"
                         id="product_title"
                         name="product_title"
                         maxlength="255"
                         required
-                        value="<?= productEscape(
-                            $product["product_title"] ?? ""
-                        ) ?>"
+                        value="<?= productEscape($product["product_title"] ?? "") ?>"
                         placeholder="e.g. Classic T-Shirt"
                     >
                 </div>
 
                 <div class="form-group">
                     <label for="product_price">Price</label>
-
                     <input
                         type="number"
                         id="product_price"
@@ -384,21 +375,14 @@ if (isset($_GET["error"])) {
                         min="0"
                         step="0.01"
                         required
-                        value="<?= productEscape(
-                            $product["product_price"] ?? ""
-                        ) ?>"
+                        value="<?= productEscape($product["product_price"] ?? "") ?>"
                         placeholder="e.g. 120.00"
                     >
                 </div>
 
                 <div class="form-group">
                     <label for="product_cat">Category</label>
-
-                    <select
-                        id="product_cat"
-                        name="product_cat"
-                        required
-                    >
+                    <select id="product_cat" name="product_cat" required>
                         <option value="">Select a category</option>
 
                         <?php foreach ($categories as $category): ?>
@@ -417,12 +401,7 @@ if (isset($_GET["error"])) {
 
                 <div class="form-group">
                     <label for="product_brand">Brand</label>
-
-                    <select
-                        id="product_brand"
-                        name="product_brand"
-                        required
-                    >
+                    <select id="product_brand" name="product_brand" required>
                         <option value="">Select a brand</option>
 
                         <?php foreach ($brands as $brand): ?>
@@ -441,31 +420,24 @@ if (isset($_GET["error"])) {
 
                 <div class="form-group">
                     <label for="product_desc">Description</label>
-
                     <textarea
                         id="product_desc"
                         name="product_desc"
                         required
                         placeholder="Describe the product..."
-                    ><?= productEscape(
-                        $product["product_desc"] ?? ""
-                    ) ?></textarea>
+                    ><?= productEscape($product["product_desc"] ?? "") ?></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="product_keywords">Keywords</label>
-
                     <input
                         type="text"
                         id="product_keywords"
                         name="product_keywords"
                         required
-                        value="<?= productEscape(
-                            $product["product_keywords"] ?? ""
-                        ) ?>"
+                        value="<?= productEscape($product["product_keywords"] ?? "") ?>"
                         placeholder="e.g. shirt, clothing, fashion"
                     >
-
                     <small class="help-text">
                         Separate keywords with commas.
                     </small>
@@ -473,8 +445,7 @@ if (isset($_GET["error"])) {
 
                 <div class="form-group">
                     <label for="product_image">
-                        Product Image
-                        <?= $isEditing ? "(Optional)" : "" ?>
+                        Product Image <?= $isEditing ? "(Optional)" : "" ?>
                     </label>
 
                     <input
@@ -489,15 +460,12 @@ if (isset($_GET["error"])) {
                         JPEG, PNG, GIF, or WEBP. Maximum size: 5 MB.
                     </small>
 
-                    <?php if (
-                        $isEditing &&
-                        !empty($product["product_image"])
-                    ): ?>
+                    <?php if ($isEditing && !empty($product["product_image"])): ?>
                         <div class="current-image">
                             <p><strong>Current image:</strong></p>
 
                             <img
-                                src="../../images/products/<?= rawurlencode(
+                                src="<?= $imageBaseUrl ?>/products/<?= rawurlencode(
                                     basename($product["product_image"])
                                 ) ?>"
                                 alt="Current product image"
@@ -511,22 +479,20 @@ if (isset($_GET["error"])) {
                         style="display: none;"
                     >
                         <p><strong>Selected image preview:</strong></p>
-                        <img id="preview-image" src="" alt="Selected image preview">
+                        <img
+                            id="preview-image"
+                            src=""
+                            alt="Selected image preview"
+                        >
                     </div>
                 </div>
 
                 <div class="button-row">
-                    <button
-                        type="submit"
-                        class="button primary-button"
-                    >
+                    <button type="submit" class="button primary-button">
                         <?= $isEditing ? "Update Product" : "Add Product" ?>
                     </button>
 
-                    <a
-                        href="product.php"
-                        class="button secondary-button"
-                    >
+                    <a href="product.php" class="button secondary-button">
                         <?= $isEditing ? "Cancel Editing" : "Clear Form" ?>
                     </a>
                 </div>

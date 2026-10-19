@@ -2,7 +2,8 @@
 <?php
 require_once __DIR__ . "/../../core/core.php";
 
-$base_url = ($_SERVER['HTTP_HOST'] === 'localhost')
+$base_url = (isset($_SERVER['HTTP_HOST']) &&
+             strpos($_SERVER['HTTP_HOST'], 'localhost') === 0)
     ? '/shoppn'
     : '/~victoria.nyonator/ecommerce/shoppn';
 ?>
@@ -17,7 +18,7 @@ $base_url = ($_SERVER['HTTP_HOST'] === 'localhost')
 
     <!-- Load the latest stylesheet -->
     <link rel="stylesheet"
-          href="<?php echo htmlspecialchars($base_url); ?>/css/style.css?v=4">
+          href="<?php echo htmlspecialchars($base_url); ?>/css/style.css?v=5">
 </head>
 
 <body>
@@ -30,7 +31,14 @@ $base_url = ($_SERVER['HTTP_HOST'] === 'localhost')
     </div>
 
     <nav>
-        <a href="<?php echo htmlspecialchars($base_url); ?>/index.php">Home</a>
+        <a href="<?php echo htmlspecialchars($base_url); ?>/index.php">
+            Home
+        </a>
+
+        <!-- Cart link available to guests and logged-in users -->
+        <a href="<?php echo htmlspecialchars($base_url); ?>/views/cart.php">
+            Cart
+        </a>
 
         <?php if (is_logged_in()): ?>
             <a href="<?php echo htmlspecialchars($base_url); ?>/views/account/index.php">
@@ -41,9 +49,11 @@ $base_url = ($_SERVER['HTTP_HOST'] === 'localhost')
                 <a href="<?php echo htmlspecialchars($base_url); ?>/views/admin/brand.php">
                     Brands
                 </a>
+
                 <a href="<?php echo htmlspecialchars($base_url); ?>/views/admin/category.php">
                     Categories
                 </a>
+
                 <a href="<?php echo htmlspecialchars($base_url); ?>/views/admin/product.php">
                     Products
                 </a>
@@ -56,6 +66,7 @@ $base_url = ($_SERVER['HTTP_HOST'] === 'localhost')
             <a href="<?php echo htmlspecialchars($base_url); ?>/views/login.php">
                 Login
             </a>
+
             <a href="<?php echo htmlspecialchars($base_url); ?>/views/register.php">
                 Register
             </a>
@@ -74,6 +85,7 @@ $base_url = ($_SERVER['HTTP_HOST'] === 'localhost')
             aria-label="Search products"
             required
         >
+
         <button type="submit">Search</button>
     </form>
 </header>

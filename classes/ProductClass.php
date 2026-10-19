@@ -486,18 +486,22 @@ class ProductClass extends Database
 
     public function addToCart($productId, $ipAddress, $customerId)
     {
-        $productId = (int) $productId;
-        $customerId = (int) $customerId;
+        $productId = filter_var($productId, FILTER_VALIDATE_INT);
 
-        if ($productId <= 0) {
+        if ($productId === false || $productId <= 0) {
             return false;
         }
 
-        // Verify that the selected product exists.
+        // Use NULL for guests instead of customer ID 0.
+        $customerId = (
+            $customerId !== null &&
+            filter_var($customerId, FILTER_VALIDATE_INT) !== false &&
+            (int) $customerId > 0
+        ) ? (int) $customerId : null;
+
+        // Verify that the product exists.
         $checkProduct = $this->conn->prepare(
-            "SELECT product_id
-             FROM products
-             WHERE product_id = ?"
+            "SELECT product_id FROM products WHERE product_id = ?"
         );
 
         if (!$checkProduct) {
@@ -509,33 +513,43 @@ class ProductClass extends Database
 
         $productResult = $checkProduct->get_result();
         $productExists = $productResult->num_rows > 0;
-
         $checkProduct->close();
 
         if (!$productExists) {
             return false;
         }
 
-        // Check whether this product is already in the cart.
-        $checkCart = $this->conn->prepare(
-            "SELECT qty
-             FROM cart
-             WHERE p_id = ?
-               AND ip_add = ?
-               AND c_id = ?
-             LIMIT 1"
-        );
+        // Find an existing cart item for this product and customer.
+        if ($customerId === null) {
+            $checkCart = $this->conn->prepare(
+                "SELECT qty FROM cart
+                 WHERE p_id = ? AND ip_add = ? AND c_id IS NULL
+                 LIMIT 1"
+            );
 
-        if (!$checkCart) {
-            return false;
+            if (!$checkCart) {
+                return false;
+            }
+
+            $checkCart->bind_param("is", $productId, $ipAddress);
+        } else {
+            $checkCart = $this->conn->prepare(
+                "SELECT qty FROM cart
+                 WHERE p_id = ? AND ip_add = ? AND c_id = ?
+                 LIMIT 1"
+            );
+
+            if (!$checkCart) {
+                return false;
+            }
+
+            $checkCart->bind_param(
+                "isi",
+                $productId,
+                $ipAddress,
+                $customerId
+            );
         }
-
-        $checkCart->bind_param(
-            "isi",
-            $productId,
-            $ipAddress,
-            $customerId
-        );
 
         $checkCart->execute();
 
@@ -544,29 +558,46 @@ class ProductClass extends Database
 
         $checkCart->close();
 
-        // If the item exists, increase its quantity.
+        // If the item already exists, increase its quantity.
         if ($existingItem) {
             $newQuantity = (int) $existingItem['qty'] + 1;
 
-            $updateCart = $this->conn->prepare(
-                "UPDATE cart
-                 SET qty = ?
-                 WHERE p_id = ?
-                   AND ip_add = ?
-                   AND c_id = ?"
-            );
+            if ($customerId === null) {
+                $updateCart = $this->conn->prepare(
+                    "UPDATE cart
+                     SET qty = ?
+                     WHERE p_id = ? AND ip_add = ? AND c_id IS NULL"
+                );
 
-            if (!$updateCart) {
-                return false;
+                if (!$updateCart) {
+                    return false;
+                }
+
+                $updateCart->bind_param(
+                    "iis",
+                    $newQuantity,
+                    $productId,
+                    $ipAddress
+                );
+            } else {
+                $updateCart = $this->conn->prepare(
+                    "UPDATE cart
+                     SET qty = ?
+                     WHERE p_id = ? AND ip_add = ? AND c_id = ?"
+                );
+
+                if (!$updateCart) {
+                    return false;
+                }
+
+                $updateCart->bind_param(
+                    "iisi",
+                    $newQuantity,
+                    $productId,
+                    $ipAddress,
+                    $customerId
+                );
             }
-
-            $updateCart->bind_param(
-                "iisi",
-                $newQuantity,
-                $productId,
-                $ipAddress,
-                $customerId
-            );
 
             $success = $updateCart->execute();
             $updateCart->close();
@@ -575,21 +606,34 @@ class ProductClass extends Database
         }
 
         // Otherwise, insert a new cart item.
-        $insertCart = $this->conn->prepare(
-            "INSERT INTO cart (p_id, ip_add, c_id, qty)
-             VALUES (?, ?, ?, 1)"
-        );
+        if ($customerId === null) {
+            $insertCart = $this->conn->prepare(
+                "INSERT INTO cart (p_id, ip_add, c_id, qty)
+                 VALUES (?, ?, NULL, 1)"
+            );
 
-        if (!$insertCart) {
-            return false;
+            if (!$insertCart) {
+                return false;
+            }
+
+            $insertCart->bind_param("is", $productId, $ipAddress);
+        } else {
+            $insertCart = $this->conn->prepare(
+                "INSERT INTO cart (p_id, ip_add, c_id, qty)
+                 VALUES (?, ?, ?, 1)"
+            );
+
+            if (!$insertCart) {
+                return false;
+            }
+
+            $insertCart->bind_param(
+                "isi",
+                $productId,
+                $ipAddress,
+                $customerId
+            );
         }
-
-        $insertCart->bind_param(
-            "isi",
-            $productId,
-            $ipAddress,
-            $customerId
-        );
 
         $success = $insertCart->execute();
         $insertCart->close();
