@@ -1,21 +1,29 @@
 
 <?php
-
 require_once __DIR__ . "/../core/core.php";
 require_once __DIR__ . "/../controllers/CartController.php";
+
+// Require login before accessing the customer's cart.
+if (!is_logged_in()) {
+    $_SESSION['error'] = "Please log in to view your shopping cart.";
+    header("Location: " . base_url() . "/views/login.php");
+    exit;
+}
+
+$customerId = (int) $_SESSION['customer_id'];
 
 $controller = new CartController();
 $ip = get_ip();
 
-$items = $controller->getCartItems($ip);
-$total = $controller->getCartTotal($ip);
+// Retrieve only this logged-in customer's cart.
+$items = $controller->getCartItems($ip, $customerId);
+$total = $controller->getCartTotal($ip, $customerId);
 
 $page_url = base_url() . "/views/cart.php";
 $remove_url = base_url() . "/actions/remove_from_cart_action.php";
 $update_url = base_url() . "/actions/update_qty_action.php";
 
 require_once __DIR__ . "/layout/header.php";
-
 ?>
 
 <div class="container my-5">

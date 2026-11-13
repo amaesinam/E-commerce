@@ -12,7 +12,6 @@ class ProductController
         $this->product = new ProductClass();
     }
 
-
     /* =========================
        BRAND
     ========================= */
@@ -36,7 +35,6 @@ class ProductController
     {
         return $this->product->updateBrand($id, $name);
     }
-
 
     /* =========================
        CATEGORY
@@ -62,7 +60,6 @@ class ProductController
         return $this->product->updateCategory($id, $name);
     }
 
-
     /* =========================
        ADD PRODUCT
     ========================= */
@@ -86,7 +83,6 @@ class ProductController
             $keywords
         );
     }
-
 
     /* =========================
        UPDATE PRODUCT
@@ -114,7 +110,6 @@ class ProductController
         );
     }
 
-
     /* =========================
        GET ONE PRODUCT
     ========================= */
@@ -123,7 +118,6 @@ class ProductController
     {
         return $this->product->getProductById($id);
     }
-
 
     /* =========================
        GET ALL PRODUCTS
@@ -134,7 +128,6 @@ class ProductController
         return $this->product->getAllProducts();
     }
 
-
     /* =========================
        HOMEPAGE PRODUCTS
     ========================= */
@@ -143,7 +136,6 @@ class ProductController
     {
         return $this->product->getFeaturedProducts($limit);
     }
-
 
     /* =========================
        FILTER BY CATEGORY
@@ -156,7 +148,6 @@ class ProductController
         );
     }
 
-
     /* =========================
        FILTER BY BRAND
     ========================= */
@@ -167,7 +158,6 @@ class ProductController
             (int) $brand_id
         );
     }
-
 
     /* =========================
        SEARCH PRODUCTS
@@ -180,17 +170,27 @@ class ProductController
         );
     }
 
-
     /* =========================
        ADD TO CART
     ========================= */
 
-    public function addToCart($productId, $ipAddress, $customerId)
+    public function addToCart($productId, $ipAddress, $customerId = null)
     {
+        // Preserve NULL for guest users.
+        if (
+            $customerId === null ||
+            $customerId === '' ||
+            (int) $customerId <= 0
+        ) {
+            $customerId = null;
+        } else {
+            $customerId = (int) $customerId;
+        }
+
         return $this->product->addToCart(
             (int) $productId,
             $ipAddress,
-            (int) $customerId
+            $customerId
         );
     }
 }

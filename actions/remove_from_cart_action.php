@@ -4,11 +4,19 @@
 require_once __DIR__ . "/../core/core.php";
 require_once __DIR__ . "/../controllers/CartController.php";
 
+// Only logged-in customers can remove cart items.
+if (!is_logged_in()) {
+    $_SESSION['error'] = "Please log in before modifying your cart.";
+    header("Location: " . base_url() . "/views/login.php");
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: " . base_url() . "/views/cart.php");
     exit;
 }
 
+$customerId = (int) $_SESSION['customer_id'];
 $selected = $_POST['remove'] ?? [];
 
 if (!is_array($selected)) {
@@ -34,7 +42,7 @@ foreach ($selected as $product_id) {
         continue;
     }
 
-    if ($controller->removeFromCart($valid_id, $ip)) {
+    if ($controller->removeFromCart($valid_id, $ip, $customerId)) {
         $removed++;
     }
 }

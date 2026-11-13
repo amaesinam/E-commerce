@@ -484,7 +484,7 @@ class ProductClass extends Database
        ADD TO CART
     ========================= */
 
-    public function addToCart($productId, $ipAddress, $customerId)
+    public function addToCart($productId, $ipAddress, $customerId = null)
     {
         $productId = filter_var($productId, FILTER_VALIDATE_INT);
 

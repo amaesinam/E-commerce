@@ -4,10 +4,19 @@
 require_once __DIR__ . "/../core/core.php";
 require_once __DIR__ . "/../controllers/CartController.php";
 
+// Only logged-in customers can update cart quantities.
+if (!is_logged_in()) {
+    $_SESSION['error'] = "Please log in before modifying your cart.";
+    header("Location: " . base_url() . "/views/login.php");
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: " . base_url() . "/views/cart.php");
     exit;
 }
+
+$customerId = (int) $_SESSION['customer_id'];
 
 $quantities = $_POST['qty'] ?? [];
 $product_ids = $_POST['update'] ?? [];
@@ -25,6 +34,7 @@ if (
 
 $controller = new CartController();
 $ip = get_ip();
+
 $updated = 0;
 $invalid = false;
 
@@ -43,7 +53,12 @@ foreach ($product_ids as $index => $product_id) {
         continue;
     }
 
-    if ($controller->updateQty($valid_id, $valid_qty, $ip)) {
+    if ($controller->updateQty(
+        $valid_id,
+        $valid_qty,
+        $ip,
+        $customerId
+    )) {
         $updated++;
     }
 }
